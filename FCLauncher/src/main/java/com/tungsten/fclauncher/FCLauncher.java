@@ -208,7 +208,12 @@ public class FCLauncher {
         argList.add(0, config.getJavaPath() + "/bin/java");
         String[] args = new String[argList.size()];
         for (int i = 0; i < argList.size(); i++) {
-            String a = argList.get(i).replace("${natives_directory}", getLibraryPath(config.getContext(), config.getJavaPath(), config.getRenderer().getPath()));
+            String a = argList.get(i);
+            String libraryPath = getLibraryPath(config.getContext(), config.getJavaPath(), config.getRenderer().getPath());
+            if (argList.get(i).contains("-Djava.library.path")) {
+                a = "-Djava.library.path=${natives_directory}";
+            }
+            a = a.replace("${natives_directory}", libraryPath);
             args[i] = config.getRenderer() == null ? a : a.replace("${gl_lib_name}", config.getRenderer().getGLPath());
         }
         return args;
