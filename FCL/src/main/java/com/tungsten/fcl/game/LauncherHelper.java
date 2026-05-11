@@ -73,7 +73,6 @@ import com.tungsten.fclcore.mod.LocalModFile;
 import com.tungsten.fclcore.mod.ModpackCompletionException;
 import com.tungsten.fclcore.mod.ModpackConfiguration;
 import com.tungsten.fclcore.mod.ModpackProvider;
-import com.tungsten.fclcore.mod.server.ServerModpackProvider;
 import com.tungsten.fclcore.task.DownloadException;
 import com.tungsten.fclcore.task.Schedulers;
 import com.tungsten.fclcore.task.Task;
@@ -81,7 +80,6 @@ import com.tungsten.fclcore.task.TaskExecutor;
 import com.tungsten.fclcore.task.TaskListener;
 import com.tungsten.fclcore.util.Lang;
 import com.tungsten.fclcore.util.LibFilter;
-import com.tungsten.fclcore.util.Logging;
 import com.tungsten.fclcore.util.StringUtils;
 import com.tungsten.fclcore.util.io.FileUtils;
 import com.tungsten.fclcore.util.io.ResponseCodeException;
@@ -162,7 +160,7 @@ public final class LauncherHelper {
                                     ModpackProvider provider = ModpackHelper.getProviderByType(configuration.getType());
                                     if (provider == null)
                                         return null;
-                                    else if (configuration.getType().equals(ServerModpackProvider.INSTANCE.getName()))
+                                    else
                                         return provider.createCompletionTask(dependencyManager, selectedVersion);
                                 } catch (IOException ignore) {
                                 }
@@ -447,7 +445,7 @@ public final class LauncherHelper {
                                 future.completeExceptionally(new CancellationException());
                                 UIManager manager = UIManager.getInstance();
                                 MainActivity.getInstance().binding.manage.setSelected(true);
-                                manager.getManageUI().checkPageManager(() -> {
+                                manager.getManageUI().runAfterInit(() -> {
                                     FCLTabLayout tabLayout = manager.getManageUI().tabLayout;
                                     tabLayout.selectTab(tabLayout.getTabAt(2));
                                 });
