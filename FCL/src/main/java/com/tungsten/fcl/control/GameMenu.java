@@ -387,6 +387,7 @@ public class GameMenu implements MenuCallback, View.OnClickListener {
         FCLSwitch disableBEGestureSwitch = findViewById(R.id.switch_be_gesture);
         FCLSwitch disableLeftTouchSwitch = findViewById(R.id.switch_left_touch);
         FCLSwitch gyroSwitch = findViewById(R.id.switch_gyro);
+        FCLSwitch gyroInvertSwitch = findViewById(R.id.switch_gyro_invert);
         FCLSwitch physicalMouseSwitch = findViewById(R.id.switch_physical_mouse_mode);
         FCLSwitch showLogSwitch = findViewById(R.id.switch_show_log);
         FCLSwitch performanceModeSwitch = findViewById(R.id.switch_performance);
@@ -432,6 +433,7 @@ public class GameMenu implements MenuCallback, View.OnClickListener {
         FXUtils.bindBoolean(disableBEGestureSwitch, menuSetting.getDisableBEGestureProperty());
         FXUtils.bindBoolean(disableLeftTouchSwitch, menuSetting.getDisableLeftTouchProperty());
         FXUtils.bindBoolean(gyroSwitch, menuSetting.getEnableGyroscopeProperty());
+        FXUtils.bindBoolean(gyroInvertSwitch, menuSetting.getInvertGyroscopeProperty());
         FXUtils.bindBoolean(physicalMouseSwitch, menuSetting.getPhysicalMouseMode());
         FXUtils.bindBoolean(showLogSwitch, menuSetting.getShowLogProperty());
         FXUtils.bindBoolean(autoShowLogSwitch, menuSetting.getAutoShowLogProperty());
@@ -491,7 +493,12 @@ public class GameMenu implements MenuCallback, View.OnClickListener {
                     while (showMemory.isChecked() && !Thread.currentThread().isInterrupted()) {
                         long usedMemory = AndroidUtilKt.getUsedMemory(getActivity()) / 1024 / 1024;
                         long totalMemory = AndroidUtilKt.getTotalMemory(getActivity()) / 1024 / 1024;
-                        long usage = usedMemory * 100 / totalMemory;
+                        long usage;
+                        if (totalMemory > 0) {
+                            usage = usedMemory * 100 / totalMemory;
+                        } else {
+                            usage = -1;
+                        }
                         Schedulers.androidUIThread().execute(() -> memoryText.setText("Mem(" + usage + "%): " + usedMemory + " / " + totalMemory + " MB"));
                         try {
                             Thread.sleep(1000);
@@ -860,7 +867,7 @@ public class GameMenu implements MenuCallback, View.OnClickListener {
     @Override
     public void onExit(int exitCode) {
         if (exitCode != 0 && fclBridge != null) {
-            JVMCrashActivity.startCrashActivity(true, activity, exitCode, fclBridge.getLogPath(), fclBridge.getRenderer(), fclBridge.getJava());
+            JVMCrashActivity.startCrashActivity(true, activity, exitCode, fclBridge.getLogPath());
             Logging.LOG.log(Level.INFO, "JVM crashed, start jvm crash activity to show errors now!");
         }
         android.os.Process.killProcess(android.os.Process.myPid());
